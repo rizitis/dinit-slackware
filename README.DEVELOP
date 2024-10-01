@@ -1,6 +1,6 @@
 dinit Version 0.19.0
 Using SlackBuild from symlink to build and run test.
-This SlackBuild for now dont build dinit as system init.
+This SlackBuild for now dont build dinit as system init but 0xBOBF not ran tests and missing 40-dinit probably because 0.17.0 version didnt have it.
 
 TODO-DEVELOP
 1.Edit SlackBuild to build dinit systeminit as 0xBOBF/dinit-slackware suggest. Its more KISS and easy everything to be in etc/dinit.d/* than /usr/lib/ etc as chimera suggest.
