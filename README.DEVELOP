@@ -2,6 +2,25 @@ Version 0.19.0
 Using SlackBuild from symlink to build and run test.
 This SlackBuild for now dont build dinit as system init.
 
+TODO-DEVELOP
+1.Edit SlackBuild to build dinit systeminit as 0xBOBF/dinit-slackware suggest. Its more KISS and easy everything to be in etc/dinit.d/* than /usr/lib/ etc as chimera suggest. 
+2. create services for remaining Slackware scripts. 
+3. check if all rc.S funcitons are supported, speciall:
+# Mount /proc if it is not already mounted:
+if [ ! -d /proc/sys -a -z "$container" ]; then
+  /sbin/mount -v proc /proc -t proc 2> /dev/null
+fi 
+ 
+
+
+
+
+
+
+
+
+
+############-INFOS-################
 From Artix https://gitea.artixlinux.org/artix/dinit-rc:
 Artix's dinit stage 1.
 
