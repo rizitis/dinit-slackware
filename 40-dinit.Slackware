@@ -1,0 +1,66 @@
+### Some hacks for compatibility with Slackware sysvinit
+### This file is used for forwarding /etc/init.d/$sv to dinit service $sv
+
+## If this file exists, we forward any initscript which has a dinit service
+[ -e /run/lsb.sysvredirectdinit ] || forcesysv=1
+
+## Dinit services directories
+[ -d /etc/dinit.d ] && etc_dinit="/etc/dinit.d"
+[ -d /lib/dinit.d ] && lib_dinit="/lib/dinit.d"
+[ -d /usr/local/lib/dinit.d ] && local_lib_dinit="/usr/local/lib/dinit.d"
+
+# Get the service basename and action
+if [ -n "${__init_d_script_name:-}" ]; then
+    service="${__init_d_script_name#rc.}"  # Remove 'rc.' prefix
+    action="$1"
+    [ x"${2:-}" = 'x--force-sysv' ] && forcesysv=1
+elif [ "${0##*/}" = "init-d-script" ] || [ "${0##*/}" = "${1:-}" ]; then
+    service="${1#rc.}"  # Remove 'rc.' prefix
+    action="$2"
+    [ x"${3:-}" = 'x--force-sysv' ] && forcesysv=1
+else
+    service="${0#rc.}"  # Remove 'rc.' prefix
+    action="${1:-}"
+    [ x"${2:-}" = 'x--force-sysv' ] && forcesysv=1
+fi
+
+service=${service##*/}  # Further cleanup if needed
+service="${service%.sh}" # Remove any .sh suffix
+
+# Check if a Dinit service exists
+dinit_service_found=0
+for dinitsrv in ${etc_dinit:-} ${lib_dinit:-} ${local_lib_dinit:-}; do
+    if [ -e "$dinitsrv/$service" ]; then
+        dinit_service_found=1
+        break
+    fi
+done
+
+if [ -z "${forcesysv:-}" ] && [ "$dinit_service_found" -eq 1 ]; then # Forward to Dinit
+    case "$action" in
+        start|stop|restart|reload|status)
+            dinitctl "$action" "$service" || true
+            exit 0
+            ;;
+        force-stop|force-reload|force-restart)
+            dinitctl --force "${action##*-}" "$service" || true
+            exit 0
+            ;;
+        *)
+            echo "WARNING: $action not supported by dinitctl, giving up"
+            exit 0
+            ;;
+    esac
+else
+    # If no Dinit service is found, attempt to run the SysV init script
+    sysv_script="/etc/rc.d/rc.$service"
+    if [ -e "$sysv_script" ]; then
+        echo "INFO: No Dinit service found for '$service'. Running SysV init script: $sysv_script"
+        "$sysv_script" "$action" || true
+        exit 0
+    else
+        echo "ERROR: No Dinit service and no SysV init script found for '$service'."
+        exit 1
+    fi
+fi
+
