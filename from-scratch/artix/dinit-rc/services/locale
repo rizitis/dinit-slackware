@@ -1,0 +1,4 @@
+type       = scripted
+command    = /usr/lib/dinit/locale
+restart    = false
+depends-on = early-root-rw.target

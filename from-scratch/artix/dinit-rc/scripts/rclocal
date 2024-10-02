@@ -1,0 +1,33 @@
+#!/bin/sh
+
+[ ! -f /etc/rc.local ] && {
+cat <<EOF > /etc/rc.local
+#!/bin/sh
+# rc.local for Artix -- enter your commands here
+# it should be run when starting local.target service
+EOF
+chmod 755 /etc/rc.local
+}
+
+[ ! -f /etc/rc.shutdown ] && {
+cat <<EOF > /etc/rc.shutdown
+#!/bin/sh
+# rc.shutdown for Artix -- enter your commands here
+# it should be run when stopping local.target service
+EOF
+chmod 755 /etc/rc.shutdown
+}
+
+case "$1" in
+    startup)
+        # Check if branding is installed
+        if [ -d /etc/local.d ]; then
+            for file in /etc/local.d/*; do
+                [ -x "$file" ] && "$file"
+            done
+        fi
+        [ -x /etc/rc.local ]    && /etc/rc.local ;;
+    shutdown) [ -x /etc/rc.shutdown ] && /etc/rc.shutdown ;;
+esac
+
+exit 0
