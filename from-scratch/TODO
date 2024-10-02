@@ -1,3 +1,6 @@
+http://www.slackware.com/config/init.php
+
+
 In theory i must create some targets according to syvinit rc scripts to be sure.. so lets name the very first first 'early-prepare-S.target' ;)
 We will discribe there as dependes-on all rc.S scripts in correct order ;)
 So every rc.S function must have as dependes-on the fuction before it in rc.S. 
